@@ -1,4 +1,5 @@
 const fs = require('fs');
+const R = require('ramda');
 const readline = require('readline');
 const {
     google
@@ -12,11 +13,30 @@ const SCOPES = ['https://www.googleapis.com/auth/presentations'];
 //const TOKEN_PATH = 'gjden.json';
 const TOKEN_PATH = 'token.json';
 
+
+var render = require('./render');
+
+
+
+function callMe(auth) {
+    var r = new render();
+
+
+    r.createCircle(auth, 300);
+    //    r.createCircle(auth, 200);
+    //    r.createCircle(auth, 100);
+}
+
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, then call the Google Slides API.
-    authorize(JSON.parse(content), listSlides);
+
+
+    //r.createCircle();
+    authorize(JSON.parse(content), callMe);
+
+
 });
 
 /**
@@ -73,28 +93,22 @@ function getNewToken(oAuth2Client, callback) {
     });
 }
 
-/**
- * Prints the number of slides and elements in a sample presentation:
- * https://docs.google.com/presentation/d/1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc/edit
- * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
- */
-function listSlides(auth) {
-    const slides = google.slides({
-        version: 'v1',
-        auth
-    });
-    slides.presentations.get({
-        //    presentationId: '1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc',
-        presentationId: '19It0lvWa0124NEueiLs4VsmCFnctAzMCdxSyMFHbaE4',
-    }, (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
-        const length = res.data.slides.length;
-        console.log('The presentation contains %s slides:', length);
-        res.data.slides.map((slide, i) => {
-            console.log(slide);
-//            console.log(slide.pageElements[0]);
+class utils {
 
-            //      console.log(`- Slide #${i + 1} contains ${slide.pageElements.length} elements.`);
+    drawCircle() {
+        fs.readFile('client_secret.json', (err, content) => {
+            if (err) return console.log('Error loading client secret file:', err);
+            // Authorize a client with credentials, then call the Google Slides API.
+
+            //r.createCircle();
+            authorize(JSON.parse(content), callMe);
+
+
         });
-    });
+    }
+    
+    
+
 }
+
+module.exports = utils;

@@ -4,9 +4,11 @@ const port = 3000
 const bodyParser = require('body-parser');
 
 const NLP = require('./nlp');
+const Utils = require('./utils');
 
 
 var nlp = new NLP();
+var utils = new Utils();
 
 nlp.test();
 
@@ -56,6 +58,15 @@ app.post('/nlp', (req, res) => {
             var value = pair[1];
             resultObj[key] = value;
         }
+        
+        //
+        
+        if(resultObj['shape'] == 'Circle'){
+            utils.drawCircle();   
+        }else{
+            console.log("OTHER SHAPE DA!");
+        }
+        
         res.send(resultObj)
     })
 

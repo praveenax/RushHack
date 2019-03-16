@@ -11,7 +11,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "comma-number": "^2.0.0",
+    "dialogflow": "^0.8.2",
+    "express": "^4.16.4",
     "googleapis": "^27.0.0",
-    "openurl": "^1.1.1"
+    "openurl": "^1.1.1",
+    "ramda": "^0.26.1"
   }
 }
