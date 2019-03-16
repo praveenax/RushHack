@@ -3,7 +3,13 @@ const app = express()
 const port = 3000
 const bodyParser = require('body-parser');
 
-const nlp = require('./nlp');
+const NLP = require('./nlp');
+
+
+var nlp = new NLP();
+
+nlp.test();
+
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
@@ -27,12 +33,20 @@ app.post('/nlp', (req, res) => {
     var token = req.body.token;
     var geo = req.body.geo;
     
-    console.log({
-        user_id:user_id,
-        token:token,
-        geo:geo
-    });
-    res.send('Hello World!')
+    var responseData = nlp.run(geo)
+    console.log(">>>> "+responseData);
+//    console.log({
+//        user_id:user_id,
+//        token:token,
+//        geo:geo
+//    });
+//    res.send('Hello World!')
+    
+    responseData.then(function(data){
+        console.log(data);
+        res.send(data)
+    })
+    
 
 
 })

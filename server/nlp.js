@@ -9,7 +9,9 @@ function testFunc(){
  * Send a query to the dialogflow agent, and return the query result.
  * @param {string} projectId The project to be used
  */
-async function runSample(projectId = 'gjden-ac410') {
+async function runSample(inputText) {
+    
+    var projectId = 'gjden-ac410'
     // A unique identifier for the given session
     const sessionId = uuid.v4();
 
@@ -23,7 +25,7 @@ async function runSample(projectId = 'gjden-ac410') {
         queryInput: {
             text: {
                 // The query to send to the dialogflow agent
-                text: 'hello',
+                text: inputText,
                 // The language used by the client (en-US)
                 languageCode: 'en-US',
             },
@@ -36,19 +38,32 @@ async function runSample(projectId = 'gjden-ac410') {
     const result = responses[0].queryResult;
     console.log(`  Query: ${result.queryText}`);
     console.log(`  Response: ${result.fulfillmentText}`);
+    
+    
     if (result.intent) {
         console.log(`  Intent: ${result.intent.displayName}`);
     } else {
         console.log(`  No intent matched.`);
     }
+    
+    return result.fulfillmentText
 }
 
 
 try {
-    runSample();
+//    runSample();
 } catch (e) {
     console.log(e);
 }
 
+class nlp{
+    test(){
+      testFunc();  
+    } 
+    
+    run(inputText){
+        return runSample(inputText)
+    }
+}
 
-module.exports = testFunc;
+module.exports = nlp;
