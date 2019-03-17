@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Indentifier</title>
+    <style>
+        body {
+            background: #3498db;
+        }
+
+        .container {
+            background: #ecf0f1;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="dynamic" class="container" style="margin-top: 10vh;">
+
+        <h2>Dynamic Entity Extraction</h2>
+
+        <input id="inputText" type="text" placeholder="Input Text" class="form-control">
+        <br>
+        <input id="inputSkeleton" type="text" placeholder="Create Skeleton" class="form-control">
+        <br>
+        <div class="container">
+            <h3>
+                <pre id="result"></pre>
+            </h3>
+            <br>
+            <button id="drawFunc" class="btn btn-success">DraW</button>
+        </div>
+    </div>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"  crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            
+            var shapeType = "";
+
+            $('#drawFunc').click(function() {
+                //
+                var commandValue = 'ELLIPSE';
+                
+                var commandValue = shapeType;
+                
+                if(commandValue.toLowerCase() == 'circle'){
+                   commandValue = 'ELLIPSE'
+                }else if(commandValue.toLowerCase() == 'rectangle'){
+                   commandValue = 'RECTANGLE'
+                }else if(commandValue.toLowerCase() == 'triangle'){
+                   commandValue = 'TRIANGLE'
+                }
+                
+                $.post("http://localhost:3000/draw", {
+                        command: commandValue
+                    },
+                    function(data, status) {
+                        alert("Data: " + data + "\nStatus: " + status);
+                    });
+            });
+
+            $('#inputSkeleton').val('Create a <!shapeType!>')
+
+            function populatePattern(skeletonText) {
+                var pattern = '';
+                var txtArr = skeletonText.split(' ');
+                //    console.log(txtArr);
+                var pattKeys = [];
+                var resObj = {};
+                var re1 = '(<)'; // Any Single Character 1
+                var re2 = '(!)'; // Any Single Character 2
+                var re3 = '(.*)'; // Non-greedy match on filler
+                var re4 = '(!)'; // Any Single Character 3
+                var re5 = '(>)';
+
+                resObj['data'] = {};
+                console.log(txtArr);
+                var scCount = 0;
+                for (var txt in txtArr) {
+
+                    console.log(txt);
+                    var pObj = txtArr[txt];
+                    var regex = re1 + re2 + re3 + re4 + re5;
+                    var p = new RegExp(regex, ["i"]);
+                    var m = p.exec(pObj);
+                    if (m != null) {
+                        var key = m[3];
+                        var keyIndex = parseInt(txt) + 1 + scCount;
+                        pattern[p] = "(.*)"
+
+                        resObj['data'][key] = keyIndex;
+                        pattKeys.push(key);
+                        pattern = pattern + '(.*)';
+                    } else {
+                        pattern = pattern + '(' + txtArr[txt] + ')';
+                    }
+
+                    if (txtArr.length - 1 != txt) {
+                        pattern = pattern + '(\\s+)';
+                    }
+
+                    scCount++;
+                }
+
+                resObj['pattern'] = pattern;
+                resObj['pattKeys'] = pattKeys;
+
+                return resObj;
+            }
+
+            function processMatcher(inputText, pattern, positionValue) {
+                console.log(inputText);
+                console.log(pattern);
+                var retObj = "";
+                var txt = inputText;
+                //    var p = new RegExp("'" + pattern + "'", ["i"]);
+                var p = new RegExp(pattern, ["i"]);
+                var m = p.exec(txt);
+                if (m != null) {
+                    //    var word1 = m[1];
+                    //    var ws1 = m[2];
+                    var word2 = m[positionValue];
+                    console.log(word2);
+                    retObj = word2;
+                    //    document.write("(" + word2.replace(/</, "&lt;") + ")" + "(" + ws1.replace(/</, "&lt;") + ")" + "\n");
+                } else {
+                    console.log('NOT MATCHING');
+                }
+
+                return retObj;
+            }
+            $("#inputText").keyup(function() {
+                console.log($('#inputText'));
+                console.log($('#inputSkeleton'));
+
+
+                var inputText = $('#inputText').val();
+                var skeletonText = $('#inputSkeleton').val();
+
+                var result_pattern = populatePattern(skeletonText)
+                console.log(result_pattern);
+                //console.log('(Create)(\\s+)(a)(\\s+)(.*)');
+                //console.log(result_pattern['pattern']);
+                var finalKVPair = {};
+                for (var dIndex in result_pattern['pattKeys']) {
+                    var keyName = result_pattern['pattKeys'][dIndex];
+                    var positionValue = result_pattern['data'][keyName];
+                    var pattMatched = processMatcher(inputText, result_pattern['pattern'], positionValue);
+                    finalKVPair[keyName] = pattMatched;
+                    shapeType = pattMatched;
+                }
+                //processMatcher(inputText, '(Create)(\\s+)(a)(\\s+)(.*)');
+                console.log(finalKVPair);
+                
+                var myJSON = JSON.stringify(finalKVPair);
+                $("#result").text(myJSON);
+            });
+        })
+    </script>
+</body>
+</html>

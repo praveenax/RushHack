@@ -16,13 +16,14 @@ const TOKEN_PATH = 'token.json';
 
 var render = require('./render');
 
-
+var shape = '';
 
 function callMe(auth) {
+    console.log("SHAPE VALUEIS >> "+shape);
     var r = new render();
 
-
-    r.createCircle(auth, 300);
+    r.createShape(auth,shape,300);
+//    r.createCircle(auth, 300);
     //    r.createCircle(auth, 200);
     //    r.createCircle(auth, 100);
 }
@@ -34,7 +35,7 @@ fs.readFile('client_secret.json', (err, content) => {
 
 
     //r.createCircle();
-    authorize(JSON.parse(content), callMe);
+//    authorize(JSON.parse(content), callMe);
 
 
 });
@@ -95,12 +96,15 @@ function getNewToken(oAuth2Client, callback) {
 
 class utils {
 
-    drawCircle() {
+    drawCircle(command) {
+        
+        console.log("DRAW CALLED");
         fs.readFile('client_secret.json', (err, content) => {
             if (err) return console.log('Error loading client secret file:', err);
             // Authorize a client with credentials, then call the Google Slides API.
 
             //r.createCircle();
+            shape = command;
             authorize(JSON.parse(content), callMe);
 
 

@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+var cors = require('cors')
 const port = 3000
 const bodyParser = require('body-parser');
 
@@ -14,6 +15,7 @@ nlp.test();
 
 
 app.use(bodyParser.json()); // support json encoded bodies
+app.use(cors())
 app.use(bodyParser.urlencoded({
     extended: true
 })); // support encoded bodies
@@ -29,6 +31,12 @@ app.get('/', function (req, res) {
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
+app.post('/draw', (req, res) => {
+    var command = req.body.command;
+    utils.drawCircle(command);  
+    res.send('success')
+    
+});
 
 app.post('/nlp', (req, res) => {
 
